@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg-page: #F5E9E2;
+  --ivory: #FFFBF8;
+  --panel: #FFFFFF;
+  --ink: #24141A;
+  --ink-soft: #8A7378;
+  --wine: #C22656;
+  --wine-deep: #8C1440;
+  --wine-darker: #5E0E2B;
+  --gold: #F0A93C;
+  --gold-soft: #FBE2B4;
+  --blush: #FBDCE6;
+  --sage: #1E9C74;
+  --sage-soft: #CFF3E3;
+  --line: #EBD9D0;
+  --danger: #C22656;
+  --radius-lg: 24px;
+  --radius-md: 15px;
+  --radius-sm: 9px;
+}
+
+*{ box-sizing: border-box; }
+
+body{
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  color: var(--ink);
+}

@@ -1,0 +1,70 @@
+# ===================================================================
+# Florescer — arquivos que NÃO vão para o repositório
+# ===================================================================
+
+# -------------------------------------------------------------------
+# SEGREDOS — o mais importante deste arquivo
+# -------------------------------------------------------------------
+# Arquivos de configuração local, onde senhas reais podem acabar sendo
+# escritas durante o desenvolvimento. Uma senha enviada ao repositório
+# continua no histórico mesmo depois de removida do código.
+**/appsettings.Local.json
+**/appsettings.*.Local.json
+**/secrets.json
+*.pfx
+*.p12
+
+# Variáveis de ambiente locais do front (sobrescrevem .env.development)
+.env
+.env.local
+.env.*.local
+
+# -------------------------------------------------------------------
+# .NET
+# -------------------------------------------------------------------
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+publish/
+*.publishsettings
+PublishProfiles/
+
+# -------------------------------------------------------------------
+# Node / React
+# -------------------------------------------------------------------
+node_modules/
+dist/
+dist-ssr/
+.vite/
+npm-debug.log*
+yarn-error.log*
+
+# -------------------------------------------------------------------
+# Uploads feitos em tempo de execução
+# -------------------------------------------------------------------
+# As imagens enviadas pelo administrador são conteúdo do sistema, não
+# código-fonte. A pasta é preservada pelo .gitkeep.
+florescer-api/src/Florescer.API/wwwroot/uploads/*
+!florescer-api/src/Florescer.API/wwwroot/uploads/.gitkeep
+
+# -------------------------------------------------------------------
+# Sistema operacional e editores
+# -------------------------------------------------------------------
+Thumbs.db
+desktop.ini
+.DS_Store
+*.swp
+
+# -------------------------------------------------------------------
+# Pasta vazia remanescente da reorganização do projeto
+# -------------------------------------------------------------------
+florescer-app/
+
+# Pacote de publicacao gerado localmente (nao versionado)
+florescer-api.zip

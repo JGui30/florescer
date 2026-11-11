@@ -1,0 +1,326 @@
+import { useState, useEffect, useCallback } from 'react';
+import { landing } from '../../services/api.js';
+import { urlDaImagem } from '../../services/http.js';
+
+const ABAS = [
+  { chave: 'secoes', rotulo: 'Textos e imagens' },
+  { chave: 'faq', rotulo: 'Perguntas frequentes' },
+  { chave: 'contato', rotulo: 'Dados do estabelecimento' },
+];
+
+const SECOES_COM_IMAGEM = {
+  hero: { varias: false, ajuda: 'Uma imagem de destaque, exibida ao lado do texto de abertura.' },
+  galeria: { varias: true, ajuda: 'Várias imagens, exibidas em grade na seção de resultados.' },
+};
+
+export default function VitrineTab() {
+  const [aba, setAba] = useState('secoes');
+  const [dados, setDados] = useState(null);
+  const [erro, setErro] = useState('');
+  const [aviso, setAviso] = useState('');
+
+  const carregar = useCallback(async () => {
+    try {
+      setDados(await landing.completa());
+      setErro('');
+    } catch (err) {
+      setErro(err.message);
+    }
+  }, []);
+
+  useEffect(() => { carregar(); }, [carregar]);
+
+  function anunciar(texto) {
+    setAviso(texto);
+    setTimeout(() => setAviso(''), 2500);
+  }
+
+  if (erro) return <div className="tab-panel active"><div className="form-error">{erro}</div></div>;
+  if (!dados) return <div className="tab-panel active"><div className="page-date">Carregando vitrine...</div></div>;
+
+  return (
+    <div className="tab-panel active">
+      <div className="topbar">
+        <div>
+          <div className="page-title">Vitrine</div>
+          <div className="page-date">Conteúdo da página pública de divulgação</div>
+        </div>
+        <a className="icon-btn" href="/" target="_blank" rel="noreferrer">Ver página ↗</a>
+      </div>
+
+      {aviso && <div className="aviso-salvo">{aviso}</div>}
+
+      <div className="filter-bar">
+        {ABAS.map((a) => (
+          <div key={a.chave} className={`chip ${aba === a.chave ? 'active' : ''}`} onClick={() => setAba(a.chave)}>
+            {a.rotulo}
+          </div>
+        ))}
+      </div>
+
+      {aba === 'secoes' && (
+        <SecoesEditor secoes={dados.secoes} onSalvo={carregar} onAviso={anunciar} />
+      )}
+      {aba === 'faq' && (
+        <FaqEditor faqs={dados.faqs} onSalvo={carregar} onAviso={anunciar} />
+      )}
+      {aba === 'contato' && (
+        <ContatoEditor estabelecimento={dados.estabelecimento} onSalvo={carregar} onAviso={anunciar} />
+      )}
+    </div>
+  );
+}
+
+function SecoesEditor({ secoes, onSalvo, onAviso }) {
+  return (
+    <div>
+      {secoes.map((s) => (
+        <SecaoCard key={s.id} secao={s} onSalvo={onSalvo} onAviso={onAviso} />
+      ))}
+    </div>
+  );
+}
+
+function SecaoCard({ secao, onSalvo, onAviso }) {
+  const config = SECOES_COM_IMAGEM[secao.chave];
+  const [titulo, setTitulo] = useState(secao.titulo);
+  const [subtitulo, setSubtitulo] = useState(secao.subtitulo || '');
+  const [texto, setTexto] = useState(secao.texto || '');
+  const [textoBotao, setTextoBotao] = useState(secao.textoBotao || '');
+  const [ativa, setAtiva] = useState(secao.ativa);
+  const [salvando, setSalvando] = useState(false);
+  const [erro, setErro] = useState('');
+
+  async function salvar() {
+    setSalvando(true);
+    setErro('');
+    try {
+      await landing.atualizarSecao(secao.id, {
+        titulo,
+        subtitulo: subtitulo || null,
+        texto: texto || null,
+        textoBotao: textoBotao || null,
+        imagemUrl: secao.imagemUrl,
+        ativa,
+      });
+      onAviso(`Seção "${titulo}" salva.`);
+      await onSalvo();
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  async function enviarImagem(arquivo) {
+    if (!arquivo) return;
+    try {
+      await landing.enviarImagem(arquivo, secao.id, null);
+      onAviso('Imagem adicionada.');
+      await onSalvo();
+    } catch (err) {
+      setErro(err.message);
+    }
+  }
+
+  async function removerImagem(id) {
+    try {
+      await landing.removerImagem(id);
+      await onSalvo();
+    } catch (err) {
+      setErro(err.message);
+    }
+  }
+
+  return (
+    <div className="panel-card vitrine-card">
+      <div className="vitrine-topo">
+        <div className="panel-title">{secao.chave}</div>
+        <label className="check-row inline">
+          <input type="checkbox" checked={ativa} onChange={(e) => setAtiva(e.target.checked)} />
+          Exibir na página
+        </label>
+      </div>
+
+      <div className="field">
+        <label>Título</label>
+        <input value={titulo} onChange={(e) => setTitulo(e.target.value)} />
+      </div>
+
+      <div className="field">
+        <label>Subtítulo</label>
+        <textarea rows="2" value={subtitulo} onChange={(e) => setSubtitulo(e.target.value)} />
+      </div>
+
+      {(secao.chave === 'diferenciais' || secao.texto) && (
+        <div className="field">
+          <label>Texto complementar</label>
+          <textarea rows="3" value={texto} onChange={(e) => setTexto(e.target.value)} />
+        </div>
+      )}
+
+      {(secao.chave === 'hero' || secao.chave === 'cta') && (
+        <div className="field">
+          <label>Texto do botão</label>
+          <input value={textoBotao} onChange={(e) => setTextoBotao(e.target.value)} />
+        </div>
+      )}
+
+      {}
+      {config && (
+        <div className="field">
+          <label>Imagens desta seção</label>
+          <div className="campo-ajuda">{config.ajuda}</div>
+          <div className="midia-grid">
+            {secao.midias.map((m) => (
+              <div className="midia-item" key={m.id}>
+                <img src={urlDaImagem(m.url)} alt={m.legenda || ''} />
+                <button className="midia-remover" onClick={() => removerImagem(m.id)}>×</button>
+              </div>
+            ))}
+
+            {}
+            {(config.varias || secao.midias.length === 0) && (
+              <label className="midia-upload">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => enviarImagem(e.target.files?.[0])}
+                  style={{ display: 'none' }}
+                />
+                + Enviar imagem
+              </label>
+            )}
+          </div>
+        </div>
+      )}
+
+      {erro && <div className="form-error">{erro}</div>}
+
+      <button className="btn btn-primary vitrine-salvar" onClick={salvar} disabled={salvando}>
+        {salvando ? 'Salvando...' : 'Salvar seção'}
+      </button>
+    </div>
+  );
+}
+
+function FaqEditor({ faqs, onSalvo, onAviso }) {
+  const [novo, setNovo] = useState({ pergunta: '', resposta: '', ordem: 99, ativa: true });
+  const [erro, setErro] = useState('');
+
+  async function criar(e) {
+    e.preventDefault();
+    try {
+      await landing.criarFaq(novo);
+      setNovo({ pergunta: '', resposta: '', ordem: 99, ativa: true });
+      onAviso('Pergunta adicionada.');
+      await onSalvo();
+    } catch (err) {
+      setErro(err.message);
+    }
+  }
+
+  async function remover(id) {
+    if (!window.confirm('Remover esta pergunta?')) return;
+    try {
+      await landing.removerFaq(id);
+      await onSalvo();
+    } catch (err) {
+      setErro(err.message);
+    }
+  }
+
+  return (
+    <div className="grid-2">
+      <div className="panel-card">
+        <div className="panel-title">Perguntas publicadas</div>
+        {faqs.map((f) => (
+          <div className="depo-item" key={f.id}>
+            <div>
+              <div className="depo-nome">{f.pergunta}</div>
+              <div className="depo-texto">{f.resposta}</div>
+            </div>
+            <button className="icon-btn danger" onClick={() => remover(f.id)}>Remover</button>
+          </div>
+        ))}
+      </div>
+
+      <div className="panel-card">
+        <div className="panel-title">Nova pergunta</div>
+        <form onSubmit={criar}>
+          <div className="field">
+            <label>Pergunta</label>
+            <input value={novo.pergunta} onChange={(e) => setNovo({ ...novo, pergunta: e.target.value })} />
+          </div>
+          <div className="field">
+            <label>Resposta</label>
+            <textarea rows="4" value={novo.resposta} onChange={(e) => setNovo({ ...novo, resposta: e.target.value })} />
+          </div>
+          {erro && <div className="form-error">{erro}</div>}
+          <button className="btn btn-primary" type="submit">Adicionar pergunta</button>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function ContatoEditor({ estabelecimento, onSalvo, onAviso }) {
+  const [dados, setDados] = useState(estabelecimento);
+  const [erro, setErro] = useState('');
+  const [salvando, setSalvando] = useState(false);
+
+  function campo(nome) {
+    return {
+      value: dados[nome] || '',
+      onChange: (e) => setDados({ ...dados, [nome]: e.target.value }),
+    };
+  }
+
+  async function salvar(e) {
+    e.preventDefault();
+    setSalvando(true);
+    setErro('');
+    try {
+      await landing.atualizarEstabelecimento(dados);
+      onAviso('Dados do estabelecimento atualizados.');
+      await onSalvo();
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setSalvando(false);
+    }
+  }
+
+  return (
+    <div className="panel-card">
+      <div className="panel-title">Dados exibidos na página e usados no contato</div>
+      <form onSubmit={salvar}>
+        <div className="campo-duplo">
+          <div className="field"><label>Nome</label><input {...campo('nome')} /></div>
+          <div className="field"><label>Slogan</label><input {...campo('slogan')} /></div>
+        </div>
+        <div className="campo-duplo">
+          <div className="field"><label>Telefone</label><input {...campo('telefone')} /></div>
+          <div className="field">
+            <label>WhatsApp (só números, com DDI)</label>
+            <input {...campo('whatsApp')} placeholder="5511970000000" />
+          </div>
+        </div>
+        <div className="campo-duplo">
+          <div className="field"><label>E-mail</label><input {...campo('email')} /></div>
+          <div className="field"><label>Horário de funcionamento</label><input {...campo('horarioFuncionamento')} /></div>
+        </div>
+        <div className="field"><label>Endereço</label><input {...campo('endereco')} /></div>
+        <div className="campo-duplo">
+          <div className="field"><label>Instagram</label><input {...campo('instagramUrl')} /></div>
+          <div className="field"><label>Facebook</label><input {...campo('facebookUrl')} /></div>
+        </div>
+
+        {erro && <div className="form-error">{erro}</div>}
+        <button className="btn btn-primary" type="submit" disabled={salvando}>
+          {salvando ? 'Salvando...' : 'Salvar dados'}
+        </button>
+      </form>
+    </div>
+  );
+}

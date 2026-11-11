@@ -1,0 +1,22 @@
+# Normaliza as quebras de linha no repositório.
+#
+# Windows termina linhas com CRLF e Linux com LF. Sem esta configuração, o
+# mesmo arquivo aparece como "totalmente alterado" quando aberto em sistemas
+# diferentes, poluindo o histórico com mudanças que não existem de fato.
+#
+# A regra abaixo grava tudo em LF no repositório e converte para o padrão do
+# sistema ao baixar.
+
+* text=auto eol=lf
+
+# Arquivos binários não devem sofrer conversão nenhuma.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
