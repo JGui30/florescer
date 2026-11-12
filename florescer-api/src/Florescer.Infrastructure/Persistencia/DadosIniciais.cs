@@ -10,6 +10,8 @@ public static class DadosIniciais
     public const string EmailAdminPadrao = "admin@florescer.com.br";
     public const string SenhaAdminPadrao = "Florescer@2025";
 
+    private const string EmailDaPrimeiraClienteDeDemonstracao = "renata.cliente@email.com";
+
     public static async Task PopularAsync(
         FlorescerDbContext banco,
         IServicoDeSenha servicoDeSenha,
@@ -297,7 +299,7 @@ public static class DadosIniciais
     private static async Task CriarHistoricoDeDemonstracaoAsync(
         FlorescerDbContext banco, IServicoDeSenha senhas, IRelogio relogio)
     {
-        if (await banco.Agendamentos.AnyAsync())
+        if (await banco.Usuarios.AnyAsync(u => u.Email == EmailDaPrimeiraClienteDeDemonstracao))
             return;
 
         var nomesDeClientes = new[]

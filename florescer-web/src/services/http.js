@@ -42,12 +42,28 @@ function limiteDeTempo() {
     : undefined;
 }
 
-function mensagemDeFalhaDeRede(erro) {
+async function aInternetRespondeu() {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return false;
+
+  try {
+    await fetch(window.location.origin, { method: 'HEAD', cache: 'no-store' });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function mensagemDeFalhaDeRede(erro) {
   if (erro?.name === 'TimeoutError') {
     return 'O servidor demorou demais para responder. Verifique a lista e, se nada mudou, tente de novo.';
   }
 
-  return 'Não foi possível falar com o servidor. Verifique sua conexão e tente de novo.';
+  if (await aInternetRespondeu()) {
+    return 'O servidor não respondeu. Ele pode estar fora do ar ou reiniciando. ' +
+           'Tente de novo em alguns instantes.';
+  }
+
+  return 'Você parece estar sem conexão com a internet. Verifique e tente de novo.';
 }
 
 function mensagemDeFalhaDoServidor(status) {
@@ -72,7 +88,7 @@ async function requisitar(caminho, opcoes = {}) {
       signal: limiteDeTempo(),
     });
   } catch (erro) {
-    throw new Error(mensagemDeFalhaDeRede(erro));
+    throw new Error(await mensagemDeFalhaDeRede(erro));
   }
 
   if (resposta.status === 401) {
@@ -132,7 +148,7 @@ export async function enviarArquivo(caminho, arquivo) {
       signal: limiteDeTempo(),
     });
   } catch (erro) {
-    throw new Error(mensagemDeFalhaDeRede(erro));
+    throw new Error(await mensagemDeFalhaDeRede(erro));
   }
 
   const texto = await resposta.text();

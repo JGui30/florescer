@@ -8,6 +8,7 @@ using Florescer.Infrastructure.Seguranca;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Florescer.Infrastructure;
 
@@ -72,8 +73,22 @@ public static class RegistroDeServicos
         var banco = escopo.ServiceProvider.GetRequiredService<FlorescerDbContext>();
         var senhas = escopo.ServiceProvider.GetRequiredService<IServicoDeSenha>();
         var relogio = escopo.ServiceProvider.GetRequiredService<IRelogio>();
+        var registrador = escopo.ServiceProvider
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("Florescer.PreparacaoDoBanco");
 
         await banco.Database.MigrateAsync();
-        await DadosIniciais.PopularAsync(banco, senhas, relogio);
+
+        try
+        {
+            await DadosIniciais.PopularAsync(banco, senhas, relogio);
+        }
+        catch (Exception erro)
+        {
+            registrador.LogError(
+                erro,
+                "Falha ao popular os dados iniciais. A API segue no ar; " +
+                "confira se o banco já contém os registros que a rotina tentou criar.");
+        }
     }
 }
