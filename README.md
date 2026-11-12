@@ -125,3 +125,13 @@ sair pela internet.
 |---|---|
 | [DICIONARIO-DADOS.md](DICIONARIO-DADOS.md) | Tabelas e colunas, com significado e consultas de exemplo |
 | [florescer-api/MODELAGEM-BANCO.md](florescer-api/MODELAGEM-BANCO.md) | Modelo de dados e justificativa de cada relacionamento |
+
+## Documentação da API
+
+A especificação OpenAPI gerada pelo projeto é publicada junto com o
+front-end, em `florescer-web/public/api-docs/`. Com a aplicação no ar, a
+documentação fica em `/api-docs`: 35 rotas agrupadas por assunto, com
+parâmetros, formatos de resposta e códigos de erro.
+
+Em desenvolvimento, o Swagger interativo continua disponível em
+`http://localhost:5080/swagger` enquanto a API estiver rodando.

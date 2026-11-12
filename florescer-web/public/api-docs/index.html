@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Florescer — Documentação da API</title>
+<meta name="description" content="Documentação da API do sistema de agendamento Florescer.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui.min.css">
+<style>
+  :root{
+    --wine:#C22656; --wine-deep:#8C1440; --gold:#F0A93C;
+    --ink:#24141A; --ink-soft:#6E5A5F; --line:#E7D8D2;
+    --page:#FFFFFF; --panel:#FBF6F3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);font-family:'Manrope',sans-serif;color:var(--ink)}
+  .capa{background:linear-gradient(135deg,var(--wine-deep),var(--wine));color:#fff;padding:34px 16px 30px}
+  .capa-dentro{max-width:1160px;margin:0 auto}
+  .capa h1{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(23px,5vw,34px);margin:0 0 6px;letter-spacing:-.01em}
+  .capa p{margin:0;opacity:.92;font-size:15px;line-height:1.55;max-width:70ch}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:5px 13px;font-size:12.5px;font-weight:500}
+  .chip b{font-weight:700}
+  .voltar{display:inline-block;margin-top:16px;color:#fff;font-size:13.5px;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.5);padding-bottom:1px}
+  .voltar:hover{border-bottom-color:#fff}
+  .nota{max-width:1160px;margin:18px auto 0;padding:13px 15px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:9px;font-size:13.5px;color:var(--ink-soft);line-height:1.6}
+  .nota b{color:var(--ink)}
+  .swagger-ui .topbar,.swagger-ui .info,.swagger-ui .auth-wrapper,.swagger-ui .scheme-container{display:none}
+  .swagger-ui{font-family:'Manrope',sans-serif}
+  .swagger-ui .opblock-tag{font-family:'Space Grotesk',sans-serif}
+  #ui{max-width:1160px;margin:0 auto;padding:0 4px 60px}
+  #erro{max-width:1160px;margin:24px auto;padding:14px 16px;border:1px solid var(--line);border-left:3px solid var(--wine);border-radius:9px;font-size:14px;display:none}
+  @media (max-width:640px){.capa{padding:26px 16px 24px}.nota{margin:14px 16px 0}}
+</style>
+</head>
+<body>
+
+<header class="capa">
+  <div class="capa-dentro">
+    <h1>Florescer &mdash; Documenta&ccedil;&atilde;o da API</h1>
+    <p>Sistema de agendamento para centro de beleza e est&eacute;tica.
+       Trabalho de Conclus&atilde;o de Curso &mdash; Sistemas de Informa&ccedil;&atilde;o.</p>
+    <div class="chips">
+      <span class="chip"><b>35</b> rotas</span>
+      <span class="chip"><b>46</b> opera&ccedil;&otilde;es</span>
+      <span class="chip"><b>37</b> modelos</span>
+      <span class="chip">ASP.NET Core 8</span>
+      <span class="chip">Autentica&ccedil;&atilde;o JWT</span>
+    </div>
+    <a class="voltar" href="/">&larr; voltar para o aplicativo</a>
+  </div>
+</header>
+
+<div class="nota">
+  <b>Esta p&aacute;gina &eacute; somente leitura.</b> Ela descreve a superf&iacute;cie da API
+  &mdash; rotas, par&acirc;metros, formatos de resposta e c&oacute;digos de erro &mdash;
+  a partir da especifica&ccedil;&atilde;o OpenAPI gerada pelo pr&oacute;prio projeto.
+  A execu&ccedil;&atilde;o de requisi&ccedil;&otilde;es est&aacute; desligada.
+</div>
+
+<div id="erro"></div>
+<div id="ui"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.17.14/swagger-ui-bundle.min.js"></script>
+<script>
+  window.addEventListener('load', function () {
+    var erro = document.getElementById('erro');
+
+    if (typeof SwaggerUIBundle === 'undefined') {
+      erro.style.display = 'block';
+      erro.textContent = 'Não foi possível carregar o visualizador da documentação. '
+        + 'Verifique sua conexão e recarregue a página.';
+      return;
+    }
+
+    SwaggerUIBundle({
+      url: '/api-docs/swagger.json',
+      dom_id: '#ui',
+      deepLinking: false,
+      supportedSubmitMethods: [],
+      defaultModelsExpandDepth: 0,
+      docExpansion: 'list',
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+      onFailure: function () {
+        erro.style.display = 'block';
+        erro.textContent = 'Não foi possível carregar a especificação da API. '
+          + 'Recarregue a página.';
+      }
+    });
+  });
+</script>
+</body>
+</html>
