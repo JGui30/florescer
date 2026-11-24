@@ -1,12 +1,16 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BloomLogo from '../../assets/BloomLogo.jsx';
-import { auth } from '../../services/api.js';
+import { auth, aquecerServidor } from '../../services/api.js';
 
 export default function AdminLogin({ onAutenticado }) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
   const [carregando, setCarregando] = useState(false);
+
+  useEffect(() => {
+    aquecerServidor();
+  }, []);
 
   async function entrar(e) {
     e.preventDefault();

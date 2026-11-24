@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BloomLogo from '../../assets/BloomLogo.jsx';
 import RecoveryFlow from './RecoveryFlow.jsx';
-import { auth } from '../../services/api.js';
+import { auth, aquecerServidor } from '../../services/api.js';
 
 export default function AuthScreen({ onAuthenticated }) {
   const [tab, setTab] = useState('login');
@@ -17,6 +17,10 @@ export default function AuthScreen({ onAuthenticated }) {
   const [pass2, setPass2] = useState('');
   const [terms, setTerms] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    aquecerServidor();
+  }, []);
 
   async function handleLogin(e) {
     e.preventDefault();

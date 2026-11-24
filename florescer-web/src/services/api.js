@@ -172,3 +172,7 @@ export const landing = {
 
   removerFaq: (id) => remover(`/api/landing/faqs/${id}`),
 };
+
+export function aquecerServidor() {
+  catalogo.categorias().catch(() => {});
+}

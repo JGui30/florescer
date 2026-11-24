@@ -71,6 +71,10 @@ function mensagemDeFalhaDoServidor(status) {
     return 'O servidor está indisponível neste momento. Tente de novo em instantes.';
   }
 
+  if (status === 429) {
+    return 'Muitas tentativas em pouco tempo. Aguarde um minuto e tente de novo.';
+  }
+
   return 'Não foi possível concluir a operação.';
 }
 
